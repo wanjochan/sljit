@@ -2,7 +2,7 @@
  *    Stack-less Just-In-Time compiler
  *
  *    Copyright 2013-2013 Tilera Corporation(jiwang@tilera.com). All rights reserved.
- *    Copyright 2009-2012 Zoltan Herczeg (hzmester@freemail.hu). All rights reserved.
+ *    Copyright Zoltan Herczeg (hzmester@freemail.hu). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -33,13 +33,13 @@
 #include <string.h>
 #define BFD_RELOC(x) R_##x
 
-/* Special regs. */
+/* Special registers. */
 #define TREG_LR 55
 #define TREG_SN 56
 #define TREG_ZERO 63
 
-/* Canonical name of each reg. */
-const char *const tilegx_reg_names[] =
+/* Canonical name of each register. */
+const char *const tilegx_register_names[] =
 {
   "r0",   "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
   "r8",   "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
@@ -215,8 +215,8 @@ enum
   TILEGX_BUNDLE_ALIGNMENT_IN_BYTES =
     (1 << TILEGX_LOG2_BUNDLE_ALIGNMENT_IN_BYTES),
 
-  /* Number of regs (some are magic, such as network I/O). */
-  TILEGX_NUM_REGS = 64,
+  /* Number of registers (some are magic, such as network I/O). */
+  TILEGX_NUM_REGISTERS = 64,
 };
 
 /* Make a few "tile_" variables to simplify common code between
@@ -233,7 +233,7 @@ typedef tilegx_bundle_bits tile_bundle_bits;
 
 typedef enum
 {
-  TILEGX_OP_TYPE_REG,
+  TILEGX_OP_TYPE_REGISTER,
   TILEGX_OP_TYPE_IMMEDIATE,
   TILEGX_OP_TYPE_ADDRESS,
   TILEGX_OP_TYPE_SPR
@@ -241,7 +241,7 @@ typedef enum
 
 struct tilegx_operand
 {
-  /* Is this operand a reg, immediate or address? */
+  /* Is this operand a register, immediate or address? */
   tilegx_operand_type type;
 
   /* The default relocation type for this operand.  */
@@ -253,10 +253,10 @@ struct tilegx_operand
   /* Is the value signed? (used for range checking) */
   unsigned int is_signed : 1;
 
-  /* Is this operand a source reg? */
+  /* Is this operand a source register? */
   unsigned int is_src_reg : 1;
 
-  /* Is this operand written? (i.e. is it a destination reg) */
+  /* Is this operand written? (i.e. is it a destination register) */
   unsigned int is_dest_reg : 1;
 
   /* Is this operand PC-relative? */
@@ -637,8 +637,8 @@ struct tilegx_opcode
   /* How many operands are there? */
   unsigned char num_operands;
 
-  /* Which reg does this write implicitly, or TREG_ZERO if none? */
-  unsigned char implicitly_written_reg;
+  /* Which register does this write implicitly, or TREG_ZERO if none? */
+  unsigned char implicitly_written_register;
 
   /* Can this be bundled with other instructions (almost always true). */
   unsigned char can_bundle;
@@ -9348,72 +9348,72 @@ const struct tilegx_operand tilegx_operands[35] =
     create_Imm16_X1, get_Imm16_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_X1, get_Dest_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_X1, get_SrcA_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_X0, get_Dest_X0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_X0, get_SrcA_X0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_Y0, get_Dest_Y0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y0, get_SrcA_Y0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_Y1, get_Dest_Y1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y1, get_SrcA_Y1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y2, get_SrcA_Y2
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_SrcA_X1, get_SrcA_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_X0, get_SrcB_X0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_X1, get_SrcB_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_Y0, get_SrcB_Y0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_Y1, get_SrcB_Y1
   },
@@ -9433,12 +9433,12 @@ const struct tilegx_operand tilegx_operands[35] =
     create_BFEnd_X0, get_BFEnd_X0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_Dest_X0, get_Dest_X0
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_Dest_Y0, get_Dest_Y0
   },
@@ -9448,7 +9448,7 @@ const struct tilegx_operand tilegx_operands[35] =
     create_JumpOff_X1, get_JumpOff_X1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_SrcBDest_Y2, get_SrcBDest_Y2
   },
@@ -9483,7 +9483,7 @@ const struct tilegx_operand tilegx_operands[35] =
     create_ShAmt_Y1, get_ShAmt_Y1
   },
   {
-    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcBDest_Y2, get_SrcBDest_Y2
   },
@@ -10049,8 +10049,8 @@ get_tilegx_spr_name (int num)
   struct tilegx_spr key;
 
   key.number = num;
-  result = bsearch(&key, tilegx_sprs,
-                   tilegx_num_sprs, sizeof(struct tilegx_spr),
+  result = bsearch((const void *) &key, (const void *) tilegx_sprs,
+                   tilegx_num_sprs, sizeof (struct tilegx_spr),
                    tilegx_spr_compare);
 
   if (result == NULL)
@@ -10073,7 +10073,7 @@ print_insn_tilegx (unsigned char * memaddr)
   int i, num_instructions, num_printed;
   tilegx_mnemonic padding_mnemonic;
 
-  memcpy(opbuf, memaddr, TILEGX_BUNDLE_SIZE_IN_BYTES);
+  memcpy((void *)opbuf, (void *)memaddr, TILEGX_BUNDLE_SIZE_IN_BYTES);
 
   /* Parse the instructions in the bundle. */
   num_instructions =
@@ -10132,8 +10132,8 @@ print_insn_tilegx (unsigned char * memaddr)
       op = decoded[i].operands[j];
       switch (op->type)
       {
-      case TILEGX_OP_TYPE_REG:
-        printf ("%s", tilegx_reg_names[(int)num]);
+      case TILEGX_OP_TYPE_REGISTER:
+        printf ("%s", tilegx_register_names[(int)num]);
         break;
       case TILEGX_OP_TYPE_SPR:
         spr_name = get_tilegx_spr_name(num);

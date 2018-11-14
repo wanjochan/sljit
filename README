@@ -1,4 +1,4 @@
-﻿
+
                      SLJIT - Stack Less JIT Compiler
 
 Purpose:
@@ -7,7 +7,7 @@ Purpose:
   describes the LIR (low-level intermediate representation) of SLJIT.
 
 Compatible:
-  Any modern C (C++) compiler. At least I hope so.
+  Any C (C++) compiler. At least I hope so.
 
 Using sljit:
   Copy the content of sljit_src directory into your project source directory.
@@ -24,6 +24,11 @@ Contact:
 
 Special thanks:
   Alexander Nasonov
+  Christian Persch
   Daniel Richard G.
   Giuseppe D'Angelo
   Jiong Wang (TileGX support)
+  Marc Mutz
+  Michael McConville
+  Walter Lee
+  Wen Xichang

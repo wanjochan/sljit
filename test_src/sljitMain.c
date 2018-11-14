@@ -24,34 +24,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <err.h>
-#include <stdbool.h>
+#include "sljitLir.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sljitLir.h"
-
 void sljit_test(int argc, char* argv[]);
+
+void error(const char* str)
+{
+	printf("An error occured: %s\n", str);
+	exit(-1);
+}
 
 union executable_code {
 	void* code;
-	long (SLJIT_CALL *func)(long* a);
+	sljit_sw (SLJIT_CALL *func)(sljit_sw* a);
 };
 typedef union executable_code executable_code;
 
 void devel(void)
 {
 	executable_code code;
-	struct sljit_compiler *compiler;
-	long buf[4] = {5, 12, 0, 0};
 
-	if ((compiler = sljit_create_compiler()) == NULL)
-		errx(-1, "out of memory");
+	struct sljit_compiler *compiler = sljit_create_compiler(NULL);
+	sljit_sw buf[4];
+
+	if (!compiler)
+		error("Not enough of memory");
+	buf[0] = 5;
+	buf[1] = 12;
+	buf[2] = 0;
+	buf[3] = 0;
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	sljit_compiler_verbose(compiler, stdout);
 #endif
-	sljit_emit_enter(compiler, 0, 1, 4, 5, 4, 0, 2 * sizeof(long));
+	sljit_emit_enter(compiler, 0, 1, 4, 5, 4, 0, 2 * sizeof(sljit_sw));
 
 	sljit_emit_return(compiler, SLJIT_MOV, SLJIT_RETURN_REG, 0);
 
@@ -60,7 +69,7 @@ void devel(void)
 
 	printf("Code at: %p\n", (void*)SLJIT_FUNC_OFFSET(code.code));
 
-	printf("Function returned with %ld\n", (long)code.func((long*)buf));
+	printf("Function returned with %ld\n", (long)code.func((sljit_sw*)buf));
 	printf("buf[0] = %ld\n", (long)buf[0]);
 	printf("buf[1] = %ld\n", (long)buf[1]);
 	printf("buf[2] = %ld\n", (long)buf[2]);
