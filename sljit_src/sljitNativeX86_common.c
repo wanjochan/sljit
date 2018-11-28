@@ -64,20 +64,22 @@ SLJIT_API_FUNC_ATTRIBUTE const char* sljit_get_platform_name(void)
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 
 /* Last register + 1. */
+//#define SLJIT_SP	(SLJIT_NUMBER_OF_REGISTERS + 1)
+//#define TMP_REG1 (SLJIT_SP+1)
 #define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
 
 static const sljit_u8 reg_map[SLJIT_NUMBER_OF_REGISTERS + 3] = {
 	0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 7, 6, 3, 4, 5
 };
 
-#define CHECK_EXTRA_REGS(p, w, do) \
+#define CHECK_EXTRA_REGS(p, w, dosth) \
 	if (p >= SLJIT_R3 && p <= SLJIT_S3) { \
 		if (p <= compiler->scratches) \
 			w = compiler->saveds_offset - ((p) - SLJIT_R2) * (sljit_sw)sizeof(sljit_sw); \
 		else \
 			w = compiler->locals_offset + ((p) - SLJIT_S2) * (sljit_sw)sizeof(sljit_sw); \
 		p = SLJIT_MEM1(SLJIT_SP); \
-		do; \
+		dosth; \
 	}
 
 #else /* SLJIT_CONFIG_X86_32 */
@@ -339,7 +341,8 @@ static void get_cpu_features(void)
 #endif
 	);
 
-#else /* _MSC_VER && _MSC_VER >= 1400 */
+//#else /* _MSC_VER && _MSC_VER >= 1400 */
+#elif (defined _MSC_VER && _MSC_VER>=1400)
 
 	/* Intel syntax. */
 	__asm {
@@ -1238,6 +1241,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_op1(struct sljit_compiler *compile
 {
 	sljit_s32 update = 0;
 	sljit_s32 op_flags = GET_ALL_FLAGS(op);
+	//NOTES X86(32) might need exra reg, here is the flag
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	sljit_s32 dst_is_ereg = 0;
 	sljit_s32 src_is_ereg = 0;
@@ -1309,14 +1313,19 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_op1(struct sljit_compiler *compile
 #endif
 			}
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
+			// do move now if no extra-reg needed for x86(32)
 			if (SLJIT_UNLIKELY(dst_is_ereg))
 				return emit_mov(compiler, dst, dstw, src, srcw);
 #endif
 		}
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-		if (SLJIT_UNLIKELY(dst_is_ereg) && (!(op == SLJIT_MOV || op == SLJIT_MOV_U32 || op == SLJIT_MOV_S32 || op == SLJIT_MOV_P) || (src & SLJIT_MEM))) {
+		if (SLJIT_UNLIKELY(dst_is_ereg) && 
+				(!(op == SLJIT_MOV || op == SLJIT_MOV_U32 || op == SLJIT_MOV_S32 || op == SLJIT_MOV_P) || (src & SLJIT_MEM)))
+		{
+			//check if dst==*SP
 			SLJIT_ASSERT(dst == SLJIT_MEM1(SLJIT_SP));
+
 			dst = TMP_REG1;
 		}
 #endif
@@ -2910,13 +2919,13 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_x86_emit_cmov(struct sljit_compiler *co
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  x86_cmov%s %s%s, ",
+		SCC(fprintf)(compiler->verbose, "  x86_cmov%s %s%s, ",
 			!(dst_reg & SLJIT_I32_OP) ? "" : ".i",
 			jump_names[type & 0xff], JUMP_POSTFIX(type));
 		sljit_verbose_reg(compiler, dst_reg & ~SLJIT_I32_OP);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 

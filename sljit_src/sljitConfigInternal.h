@@ -34,9 +34,11 @@
      sljit_s8, sljit_u8   : signed and unsigned 8 bit integer type
      sljit_s16, sljit_u16 : signed and unsigned 16 bit integer type
      sljit_s32, sljit_u32 : signed and unsigned 32 bit integer type
+		 //? why not sljit_u64 and sljit_s64 ?
      sljit_sw, sljit_uw   : signed and unsigned machine word, enough to store a pointer
      sljit_p              : unsgined pointer value (usually the same as sljit_uw, but
                             some 64 bit ABIs may use 32 bit pointers)
+		//in some arch maybe float/double is not 32/64 ??
      sljit_f32            : 32 bit single precision floating point value
      sljit_f64            : 64 bit double precision floating point value
 
@@ -143,6 +145,7 @@
 #else
 /* Unsupported architecture */
 #define SLJIT_CONFIG_UNSUPPORTED 1
+#error "Multiple architectures are selected"
 #endif
 
 #else /* !_WIN32 */
@@ -195,19 +198,19 @@
 */
 
 #ifndef SLJIT_MALLOC
-#define SLJIT_MALLOC(size, allocator_data) malloc(size)
+#define SLJIT_MALLOC(size, allocator_data) SCC(malloc)(size)
 #endif
 
 #ifndef SLJIT_FREE
-#define SLJIT_FREE(ptr, allocator_data) free(ptr)
+#define SLJIT_FREE(ptr, allocator_data) SCC(free)(ptr)
 #endif
 
 #ifndef SLJIT_MEMCPY
-#define SLJIT_MEMCPY(dest, src, len) memcpy(dest, src, len)
+#define SLJIT_MEMCPY(dest, src, len) SCC(memcpy)(dest, src, len)
 #endif
 
 #ifndef SLJIT_ZEROMEM
-#define SLJIT_ZEROMEM(dest, len) memset(dest, 0, len)
+#define SLJIT_ZEROMEM(dest, len) SCC(memset)(dest, 0, len)
 #endif
 
 /***************************/
@@ -217,6 +220,7 @@
 #if !defined(SLJIT_LIKELY) && !defined(SLJIT_UNLIKELY)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
+//boost with gnu special:
 #define SLJIT_LIKELY(x)		__builtin_expect((x), 1)
 #define SLJIT_UNLIKELY(x)	__builtin_expect((x), 0)
 #else
@@ -363,12 +367,14 @@ typedef long int sljit_sw;
 	&& !(defined SLJIT_CONFIG_TILEGX && SLJIT_CONFIG_TILEGX)
 #define SLJIT_32BIT_ARCHITECTURE 1
 #define SLJIT_WORD_SHIFT 2
+//?? how u know int is 32bit??
 typedef unsigned int sljit_uw;
 typedef int sljit_sw;
 #else
 #define SLJIT_64BIT_ARCHITECTURE 1
 #define SLJIT_WORD_SHIFT 3
 #ifdef _WIN32
+//@ref __int64 in window.h?
 typedef unsigned __int64 sljit_uw;
 typedef __int64 sljit_sw;
 #else
@@ -657,9 +663,9 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 /* Debug and verbose related macros. */
 /*************************************/
 
-#if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-#include <stdio.h>
-#endif
+//#if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
+//#include <stdio.h>
+//#endif
 
 #if (defined SLJIT_DEBUG && SLJIT_DEBUG)
 
@@ -667,13 +673,13 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 
 /* SLJIT_HALT_PROCESS must halt the process. */
 #ifndef SLJIT_HALT_PROCESS
-#include <stdlib.h>
+//#include <stdlib.h>
 
 #define SLJIT_HALT_PROCESS() \
-	abort();
+	SCC(abort)();
 #endif /* !SLJIT_HALT_PROCESS */
 
-#include <stdio.h>
+//#include <stdio.h>
 
 #endif /* !SLJIT_ASSERT || !SLJIT_UNREACHABLE */
 
@@ -683,7 +689,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 #define SLJIT_ASSERT(x) \
 	do { \
 		if (SLJIT_UNLIKELY(!(x))) { \
-			printf("Assertion failed at " __FILE__ ":%d\n", __LINE__); \
+			SCC(printf)("Assertion failed at " __FILE__ ":%d\n", __LINE__); \
 			SLJIT_HALT_PROCESS(); \
 		} \
 	} while (0)
@@ -694,7 +700,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 
 #define SLJIT_UNREACHABLE() \
 	do { \
-		printf("Should never been reached " __FILE__ ":%d\n", __LINE__); \
+		SCC(printf)("Should never been reached " __FILE__ ":%d\n", __LINE__); \
 		SLJIT_HALT_PROCESS(); \
 	} while (0)
 

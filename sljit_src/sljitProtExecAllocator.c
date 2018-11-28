@@ -60,7 +60,10 @@
    and "used block" is freed, the three blocks are connected together:
      [           one big free block           ]
 */
-
+/* When SLJIT_PROT_EXECUTABLE_ALLOCATOR is enabled SLJIT uses
+   an allocator which does not set writable and executable
+   permission flags at the same time. The trade-of is increased
+   memory consumption and disabled dynamic code modifications. */
 /* --------------------------------------------------------------------- */
 /*  System (OS) functions                                                */
 /* --------------------------------------------------------------------- */

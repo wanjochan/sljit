@@ -28,9 +28,57 @@
 /*  Locks                                                                   */
 /* ------------------------------------------------------------------------ */
 
+
+/*?sao
+	@<c>;
+	@?(SLJIT_EXECUTABLE_ALLOCATOR || SLJIT_UTIL_GLOBAL_LOCK){
+			@?(SLJIT_SINGLE_THREADED){
+				@?(SLJIT_EXECUTABLE_ALLOCATOR){
+					allocator_grab_lock = ()=>true;
+					allocator_release_lock = ()=>true;
+				}
+				@?(SLJIT_UTIL_GLOBAL_LOCK){
+					sljit_grab_lock = ()=>true;
+					sljit_release_lock = ()=>true;
+				}
+			}@:?(_WIN32){
+				@<windows>;
+				@.allocator_mutex = 0;//attach to current module static area.
+
+				@?(SLJIT_EXECUTABLE_ALLOCATOR){
+					allocator_grab_lock = ()=>{
+						@?(allocator_mutex){
+							windows.WaitForSingleObject(allocator_mutex, windows.INFINITE);
+						}@:{
+							allocator_mutex = windows.CreateMutex(c.NULL, c.TRUE, C.NULL);
+						}
+					};
+					allocator_release_lock = () =>{
+						windows.ReleaseMutex(allocator_mutex);
+					};
+				}
+
+				@?(SLJIT_EXECUTABLE_ALLOCATOR){
+					@.global_mutex = 0;
+					allocator_grab_lock = ()=>{
+						@?(global_mutex){
+							windows.WaitForSingleObject(global_mutex, windows.INFINITE);
+						}@:{
+							global_mutex = windows.CreateMutex(c.NULL, c.TRUE, C.NULL);
+						}
+					};
+					allocator_release_lock = () =>{
+						windows.ReleaseMutex(global_mutex);
+					};
+				}
+				
+			}
+	 }
+*/
+
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR) || (defined SLJIT_UTIL_GLOBAL_LOCK && SLJIT_UTIL_GLOBAL_LOCK)
 
-#if (defined SLJIT_SINGLE_THREADED && SLJIT_SINGLE_THREADED)
+#if (defined SLJIT_SINGLE_THREADED && SLJIT_SINGLE_THREADED) //@?(SLJIT_SINGLE_THREADED){
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
 
@@ -60,7 +108,7 @@ SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_release_lock(void)
 
 #endif /* SLJIT_UTIL_GLOBAL_LOCK */
 
-#elif defined(_WIN32) /* SLJIT_SINGLE_THREADED */
+#elif defined(_WIN32) //}@:?(_WIN32){
 
 #include "windows.h"
 
@@ -104,7 +152,7 @@ SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_release_lock(void)
 
 #endif /* SLJIT_UTIL_GLOBAL_LOCK */
 
-#else /* _WIN32 */
+#else //}@:{ //unix
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
 
@@ -122,7 +170,7 @@ static SLJIT_INLINE void allocator_release_lock(void)
 	pthread_mutex_unlock(&allocator_mutex);
 }
 
-#endif /* SLJIT_EXECUTABLE_ALLOCATOR */
+#endif
 
 #if (defined SLJIT_UTIL_GLOBAL_LOCK && SLJIT_UTIL_GLOBAL_LOCK)
 
@@ -142,7 +190,7 @@ SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_release_lock(void)
 
 #endif /* SLJIT_UTIL_GLOBAL_LOCK */
 
-#endif /* _WIN32 */
+#endif  //}
 
 /* ------------------------------------------------------------------------ */
 /*  Stack                                                                   */

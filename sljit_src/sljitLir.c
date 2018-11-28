@@ -29,8 +29,8 @@
 #if !(defined SLJIT_STD_MACROS_DEFINED && SLJIT_STD_MACROS_DEFINED)
 
 /* These libraries are needed for the macros below. */
-#include <stdlib.h>
-#include <string.h>
+//#include <stdlib.h>
+//#include <string.h>
 
 #endif /* SLJIT_STD_MACROS_DEFINED */
 
@@ -251,7 +251,7 @@
 /* Utils can still be used even if SLJIT_CONFIG_UNSUPPORTED is set. */
 #include "sljitUtils.c"
 
-#if !(defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
+#if !(defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED) //{
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
 
@@ -761,60 +761,60 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_compiler_verbose(struct sljit_compiler *comp
 #define sljit_verbose_reg(compiler, r) \
 	do { \
 		if ((r) < (SLJIT_R0 + compiler->scratches)) \
-			fprintf(compiler->verbose, "r%d", (r) - SLJIT_R0); \
+			SCC(fprintf)(compiler->verbose, "r%d", (r) - SLJIT_R0); \
 		else if ((r) != SLJIT_SP) \
-			fprintf(compiler->verbose, "s%d", SLJIT_NUMBER_OF_REGISTERS - (r)); \
+			SCC(fprintf)(compiler->verbose, "s%d", SLJIT_NUMBER_OF_REGISTERS - (r)); \
 		else \
-			fprintf(compiler->verbose, "sp"); \
+			SCC(fprintf)(compiler->verbose, "sp"); \
 	} while (0)
 
 #define sljit_verbose_param(compiler, p, i) \
 	if ((p) & SLJIT_IMM) \
-		fprintf(compiler->verbose, "#%" SLJIT_PRINT_D "d", (i)); \
+		SCC(fprintf)(compiler->verbose, "#%" SLJIT_PRINT_D "d", (i)); \
 	else if ((p) & SLJIT_MEM) { \
 		if ((p) & REG_MASK) { \
-			fputc('[', compiler->verbose); \
+			SCC(fputc)('[', compiler->verbose); \
 			sljit_verbose_reg(compiler, (p) & REG_MASK); \
 			if ((p) & OFFS_REG_MASK) { \
-				fprintf(compiler->verbose, " + "); \
+				SCC(fprintf)(compiler->verbose, " + "); \
 				sljit_verbose_reg(compiler, OFFS_REG(p)); \
 				if (i) \
-					fprintf(compiler->verbose, " * %d", 1 << (i)); \
+					SCC(fprintf)(compiler->verbose, " * %d", 1 << (i)); \
 			} \
 			else if (i) \
-				fprintf(compiler->verbose, " + %" SLJIT_PRINT_D "d", (i)); \
-			fputc(']', compiler->verbose); \
+				SCC(fprintf)(compiler->verbose, " + %" SLJIT_PRINT_D "d", (i)); \
+			SCC(fputc)(']', compiler->verbose); \
 		} \
 		else \
-			fprintf(compiler->verbose, "[#%" SLJIT_PRINT_D "d]", (i)); \
+			SCC(fprintf)(compiler->verbose, "[#%" SLJIT_PRINT_D "d]", (i)); \
 	} else if (p) \
 		sljit_verbose_reg(compiler, p); \
 	else \
-		fprintf(compiler->verbose, "unused");
+		SCC(fprintf)(compiler->verbose, "unused");
 
 #define sljit_verbose_fparam(compiler, p, i) \
 	if ((p) & SLJIT_MEM) { \
 		if ((p) & REG_MASK) { \
-			fputc('[', compiler->verbose); \
+			SCC(fputc)('[', compiler->verbose); \
 			sljit_verbose_reg(compiler, (p) & REG_MASK); \
 			if ((p) & OFFS_REG_MASK) { \
-				fprintf(compiler->verbose, " + "); \
+				SCC(fprintf)(compiler->verbose, " + "); \
 				sljit_verbose_reg(compiler, OFFS_REG(p)); \
 				if (i) \
-					fprintf(compiler->verbose, "%d", 1 << (i)); \
+					SCC(fprintf)(compiler->verbose, "%d", 1 << (i)); \
 			} \
 			else if (i) \
-				fprintf(compiler->verbose, "%" SLJIT_PRINT_D "d", (i)); \
-			fputc(']', compiler->verbose); \
+				SCC(fprintf)(compiler->verbose, "%" SLJIT_PRINT_D "d", (i)); \
+			SCC(fputc)(']', compiler->verbose); \
 		} \
 		else \
-			fprintf(compiler->verbose, "[#%" SLJIT_PRINT_D "d]", (i)); \
+			SCC(fprintf)(compiler->verbose, "[#%" SLJIT_PRINT_D "d]", (i)); \
 	} \
 	else { \
 		if ((p) < (SLJIT_FR0 + compiler->fscratches)) \
-			fprintf(compiler->verbose, "fr%d", (p) - SLJIT_FR0); \
+			SCC(fprintf)(compiler->verbose, "fr%d", (p) - SLJIT_FR0); \
 		else \
-			fprintf(compiler->verbose, "fs%d", SLJIT_NUMBER_OF_FLOAT_REGISTERS - (p)); \
+			SCC(fprintf)(compiler->verbose, "fs%d", SLJIT_NUMBER_OF_FLOAT_REGISTERS - (p)); \
 	}
 
 static const char* op0_names[] = {
@@ -917,7 +917,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compil
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose))
-		fprintf(compiler->verbose, "  enter options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
+		SCC(fprintf)(compiler->verbose, "  enter options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
 			args, scratches, saveds, fscratches, fsaveds, local_size);
 #endif
 	CHECK_RETURN_OK;
@@ -942,7 +942,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compi
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose))
-		fprintf(compiler->verbose, "  set_context options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
+		SCC(fprintf)(compiler->verbose, "  set_context options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
 			args, scratches, saveds, fscratches, fsaveds, local_size);
 #endif
 	CHECK_RETURN_OK;
@@ -963,11 +963,15 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compi
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
 		if (op == SLJIT_UNUSED)
-			fprintf(compiler->verbose, "  return\n");
-		else {
-			fprintf(compiler->verbose, "  return%s ", op1_names[op - SLJIT_OP1_BASE]);
+		{
+			//void
+			SCC(fprintf)(compiler->verbose, "  return\n");
+		}
+		else
+		{
+			SCC(fprintf)(compiler->verbose, "  return%s ", op1_names[op - SLJIT_OP1_BASE]);
 			sljit_verbose_param(compiler, src, srcw);
-			fprintf(compiler->verbose, "\n");
+			SCC(fprintf)(compiler->verbose, "\n");
 		}
 	}
 #endif
@@ -982,9 +986,9 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_c
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  fast_enter ");
+		SCC(fprintf)(compiler->verbose, "  fast_enter ");
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -998,9 +1002,9 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  fast_return ");
+		SCC(fprintf)(compiler->verbose, "  fast_return ");
 		sljit_verbose_param(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1018,11 +1022,11 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose))
 	{
-		fprintf(compiler->verbose, "  %s", op0_names[GET_OPCODE(op) - SLJIT_OP0_BASE]);
+		SCC(fprintf)(compiler->verbose, "  %s", op0_names[GET_OPCODE(op) - SLJIT_OP0_BASE]);
 		if (GET_OPCODE(op) >= SLJIT_DIVMOD_UW) {
-			fprintf(compiler->verbose, (op & SLJIT_I32_OP) ? "32" : "w");
+			SCC(fprintf)(compiler->verbose, (op & SLJIT_I32_OP) ? "32" : "w");
 		}
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1088,20 +1092,20 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
 		if (GET_OPCODE(op) <= SLJIT_MOVU_P)
 		{
-			fprintf(compiler->verbose, "  mov%s%s%s ", (GET_OPCODE(op) >= SLJIT_MOVU) ? "u" : "",
+			SCC(fprintf)(compiler->verbose, "  mov%s%s%s ", (GET_OPCODE(op) >= SLJIT_MOVU) ? "u" : "",
 				!(op & SLJIT_I32_OP) ? "" : "32", (op != SLJIT_MOV32 && op != SLJIT_MOVU32) ? op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE] : "");
 		}
 		else
 		{
-			fprintf(compiler->verbose, "  %s%s%s%s%s ", op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE], !(op & SLJIT_I32_OP) ? "" : "32",
+			SCC(fprintf)(compiler->verbose, "  %s%s%s%s%s ", op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE], !(op & SLJIT_I32_OP) ? "" : "32",
 				!(op & SLJIT_SET_Z) ? "" : ".z", !(op & VARIABLE_FLAG_MASK) ? "" : ".",
 				!(op & VARIABLE_FLAG_MASK) ? "" : jump_names[GET_FLAG_TYPE(op)]);
 		}
 
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1165,15 +1169,15 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  %s%s%s%s%s ", op2_names[GET_OPCODE(op) - SLJIT_OP2_BASE], !(op & SLJIT_I32_OP) ? "" : "32",
+		SCC(fprintf)(compiler->verbose, "  %s%s%s%s%s ", op2_names[GET_OPCODE(op) - SLJIT_OP2_BASE], !(op & SLJIT_I32_OP) ? "" : "32",
 			!(op & SLJIT_SET_Z) ? "" : ".z", !(op & VARIABLE_FLAG_MASK) ? "" : ".",
 			!(op & VARIABLE_FLAG_MASK) ? "" : jump_names[GET_FLAG_TYPE(op)]);
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src1, src1w);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src2, src2w);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1222,10 +1226,10 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_co
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  op_custom");
+		SCC(fprintf)(compiler->verbose, "  op_custom");
 		for (i = 0; i < size; i++)
-			fprintf(compiler->verbose, " 0x%x", ((sljit_u8*)instruction)[i]);
-		fprintf(compiler->verbose, "\n");
+			SCC(fprintf)(compiler->verbose, " 0x%x", ((sljit_u8*)instruction)[i]);
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1250,16 +1254,16 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compile
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
 		if (GET_OPCODE(op) == SLJIT_CONV_F64_FROM_F32)
-			fprintf(compiler->verbose, "  %s%s ", fop1_names[SLJIT_CONV_F64_FROM_F32 - SLJIT_FOP1_BASE],
+			SCC(fprintf)(compiler->verbose, "  %s%s ", fop1_names[SLJIT_CONV_F64_FROM_F32 - SLJIT_FOP1_BASE],
 				(op & SLJIT_F32_OP) ? ".f32.from.f64" : ".f64.from.f32");
 		else
-			fprintf(compiler->verbose, "  %s%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
+			SCC(fprintf)(compiler->verbose, "  %s%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
 				(op & SLJIT_F32_OP) ? ".f32" : ".f64");
 
 		sljit_verbose_fparam(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1289,15 +1293,15 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_com
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  %s%s", fop1_names[SLJIT_CMP_F64 - SLJIT_FOP1_BASE], (op & SLJIT_F32_OP) ? ".f32" : ".f64");
+		SCC(fprintf)(compiler->verbose, "  %s%s", fop1_names[SLJIT_CMP_F64 - SLJIT_FOP1_BASE], (op & SLJIT_F32_OP) ? ".f32" : ".f64");
 		if (op & VARIABLE_FLAG_MASK) {
-			fprintf(compiler->verbose, ".%s_f", jump_names[GET_FLAG_TYPE(op)]);
+			SCC(fprintf)(compiler->verbose, ".%s_f", jump_names[GET_FLAG_TYPE(op)]);
 		}
-		fprintf(compiler->verbose, " ");
+		SCC(fprintf)(compiler->verbose, " ");
 		sljit_verbose_fparam(compiler, src1, src1w);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src2, src2w);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1321,13 +1325,13 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_conv_sw_from_f64(str
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
+		SCC(fprintf)(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
 			(GET_OPCODE(op) == SLJIT_CONV_S32_FROM_F64) ? ".s32" : ".sw",
 			(op & SLJIT_F32_OP) ? ".f32" : ".f64");
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1351,13 +1355,13 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_conv_f64_from_sw(str
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
+		SCC(fprintf)(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
 			(op & SLJIT_F32_OP) ? ".f32" : ".f64",
 			(GET_OPCODE(op) == SLJIT_CONV_F64_FROM_S32) ? ".s32" : ".sw");
 		sljit_verbose_fparam(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1378,13 +1382,13 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compile
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  %s%s ", fop2_names[GET_OPCODE(op) - SLJIT_FOP2_BASE], (op & SLJIT_F32_OP) ? ".f32" : ".f64");
+		SCC(fprintf)(compiler->verbose, "  %s%s ", fop2_names[GET_OPCODE(op) - SLJIT_FOP2_BASE], (op & SLJIT_F32_OP) ? ".f32" : ".f64");
 		sljit_verbose_fparam(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src1, src1w);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src2, src2w);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1400,7 +1404,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compil
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose))
-		fprintf(compiler->verbose, "label:\n");
+		SCC(fprintf)(compiler->verbose, "label:\n");
 #endif
 	CHECK_RETURN_OK;
 }
@@ -1429,7 +1433,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compile
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose))
-		fprintf(compiler->verbose, "  jump%s %s%s\n", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
+		SCC(fprintf)(compiler->verbose, "  jump%s %s%s\n", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			jump_names[type & 0xff], JUMP_POSTFIX(type));
 #endif
 	CHECK_RETURN_OK;
@@ -1448,12 +1452,12 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  cmp%s %s%s, ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
+		SCC(fprintf)(compiler->verbose, "  cmp%s %s%s, ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			jump_names[type & 0xff], (type & SLJIT_I32_OP) ? "32" : "");
 		sljit_verbose_param(compiler, src1, src1w);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_param(compiler, src2, src2w);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1473,12 +1477,12 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compile
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  fcmp%s %s%s, ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
+		SCC(fprintf)(compiler->verbose, "  fcmp%s %s%s, ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			jump_names[type & 0xff], (type & SLJIT_F32_OP) ? ".f32" : ".f64");
 		sljit_verbose_fparam(compiler, src1, src1w);
-		fprintf(compiler->verbose, ", ");
+		SCC(fprintf)(compiler->verbose, ", ");
 		sljit_verbose_fparam(compiler, src2, src2w);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1502,9 +1506,9 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compil
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  ijump.%s ", jump_names[type]);
+		SCC(fprintf)(compiler->verbose, "  ijump.%s ", jump_names[type]);
 		sljit_verbose_param(compiler, src, srcw);
-		fprintf(compiler->verbose, "\n");
+		SCC(fprintf)(compiler->verbose, "\n");
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1538,16 +1542,16 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_com
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  flags%s %s%s, ",
+		SCC(fprintf)(compiler->verbose, "  flags%s %s%s, ",
 			!(op & SLJIT_SET_Z) ? "" : ".z",
 			GET_OPCODE(op) < SLJIT_OP2_BASE ? "mov" : op2_names[GET_OPCODE(op) - SLJIT_OP2_BASE],
 			GET_OPCODE(op) < SLJIT_OP2_BASE ? op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE] : ((op & SLJIT_I32_OP) ? "32" : ""));
 		sljit_verbose_param(compiler, dst, dstw);
 		if (src != SLJIT_UNUSED) {
-			fprintf(compiler->verbose, ", ");
+			SCC(fprintf)(compiler->verbose, ", ");
 			sljit_verbose_param(compiler, src, srcw);
 		}
-		fprintf(compiler->verbose, ", %s%s\n", jump_names[type & 0xff], JUMP_POSTFIX(type));
+		SCC(fprintf)(compiler->verbose, ", %s%s\n", jump_names[type & 0xff], JUMP_POSTFIX(type));
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1562,9 +1566,9 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_co
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  local_base ");
+		SCC(fprintf)(compiler->verbose, "  local_base ");
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", offset);
+		SCC(fprintf)(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", offset);
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1579,9 +1583,9 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compil
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
-		fprintf(compiler->verbose, "  const ");
+		SCC(fprintf)(compiler->verbose, "  const ");
 		sljit_verbose_param(compiler, dst, dstw);
-		fprintf(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", init_value);
+		SCC(fprintf)(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", init_value);
 	}
 #endif
 	CHECK_RETURN_OK;
@@ -1806,7 +1810,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_get_local_base(struct sljit_compiler *c
 
 #endif
 
-#else /* SLJIT_CONFIG_UNSUPPORTED */
+#else //}@:{
 
 /* Empty function bodies for those machines, which are not (yet) supported. */
 
@@ -2141,4 +2145,4 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_consta
 	SLJIT_UNREACHABLE();
 }
 
-#endif
+#endif //}

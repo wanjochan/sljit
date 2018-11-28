@@ -1,0 +1,33 @@
+./regex_src/regexJIT.c:#include <stdlib.h>
+./regex_src/regexJIT.c:#include <stdio.h>
+./regex_src/regexMain.c:#include <stdio.h>
+./sljit_src/sljitNativeTILEGX-encoder.c:#include <stdio.h>
+./sljit_src/sljitNativeTILEGX-encoder.c:#include <stdlib.h>
+./sljit_src/sljitNativeTILEGX-encoder.c:#include <string.h>
+./sljit_src/sljitNativeX86_common.c:#include <cmnintrin.h>
+./sljit_src/sljitNativeX86_common.c:#include <intrin.h>
+./sljit_src/sljitNativeX86_common.c:#include <malloc.h>
+./sljit_src/sljitNativePPC_common.c:#include <sys/cache.h>
+./sljit_src/sljitUtils.c:#include <pthread.h>
+./sljit_src/sljitUtils.c:#include <pthread.h>
+./sljit_src/sljitUtils.c:#include <sys/mman.h>
+./sljit_src/sljitUtils.c:#include <unistd.h>
+./sljit_src/sljitUtils.c:#include <fcntl.h>
+./sljit_src/sljitUtils.c:#include <pthread.h>
+./sljit_src/sljitLir.c:#include <stdlib.h>
+./sljit_src/sljitLir.c:#include <string.h>
+./sljit_src/sljitConfigInternal.h:#include <stdio.h>
+./sljit_src/sljitConfigInternal.h:#include <stdlib.h>
+./sljit_src/sljitConfigInternal.h:#include <stdio.h>
+./sljit_src/sljitProtExecAllocator.c:#include <fcntl.h>
+./test_src/sljitMain.c:#include <stdio.h>
+./test_src/sljitMain.c:#include <stdlib.h>
+./test_src/sljitTest.c:#include <stdio.h>
+./test_src/sljitTest.c:#include <stdlib.h>
+./test_src/sljitTest.c:#include <string.h>
+
+win32 (
+SLJIT_EXECUTABLE_ALLOCATOR => pthread.h (pthread_mutex_lock,pthread_mutex_unlock) => allocator_grab_lock(), allocator_release_lock()
++
+SLJIT_UTIL_GLOBAL_LOCK => sljit_grab_lock(),sljit_release_lock()
+)

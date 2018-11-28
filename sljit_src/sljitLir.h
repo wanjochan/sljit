@@ -78,6 +78,11 @@
 sljit based code generators. They are listed in the beginning
 of sljitConfigInternal.h */
 
+#ifndef SCC
+#define SCC(n,...) n
+#include <stdio.h>
+#endif
+
 #include "sljitConfigInternal.h"
 
 /* --------------------------------------------------------------------- */
@@ -183,6 +188,9 @@ of sljitConfigInternal.h */
    The i parameter must be >= 0 and < SLJIT_NUMBER_OF_REGISTERS. */
 #define SLJIT_R(i)	(1 + (i))
 
+//@ref https://en.wikipedia.org/wiki/X86_calling_conventions
+//The registers RAX, RCX, RDX, R8, R9, R10, R11 are considered volatile (caller-saved).[17]
+//The registers RBX, RBP, RDI, RSI, RSP, R12, R13, R14, and R15 are considered nonvolatile (callee-saved).[17]
 /* Saved registers. */
 #define SLJIT_S0	(SLJIT_NUMBER_OF_REGISTERS)
 #define SLJIT_S1	(SLJIT_NUMBER_OF_REGISTERS - 1)
@@ -272,7 +280,7 @@ of sljitConfigInternal.h */
 struct sljit_memory_fragment {
 	struct sljit_memory_fragment *next;
 	sljit_uw used_size;
-	/* Must be aligned to sljit_sw. */
+	/* NOTES: Must be aligned to sljit_sw. */
 	sljit_u8 memory[1];
 };
 
@@ -313,6 +321,9 @@ struct sljit_compiler {
 	struct sljit_memory_fragment *buf;
 	struct sljit_memory_fragment *abuf;
 
+	//@ref:
+	//https://en.wikipedia.org/wiki/Calling_convention
+	//https://community.arm.com/tools/f/discussions/843/concept-of-scratch-and-preserved-registers
 	/* Used scratch registers. */
 	sljit_s32 scratches;
 	/* Used saved registers. */
@@ -334,13 +345,16 @@ struct sljit_compiler {
 	sljit_s32 args;
 	sljit_s32 locals_offset;
 	sljit_s32 saveds_offset;
-#endif
-
-#if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
+#elif (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
 	sljit_s32 mode32;
 #ifdef _WIN64
 	sljit_s32 locals_offset;
 #endif
+
+#else
+
+	//TODO not x86 32/64
+
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
@@ -639,7 +653,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_fast_return(struct sljit_compiler 
 
 /* Register output: simply the name of the register.
    For destination, you can use SLJIT_UNUSED as well. */
-#define SLJIT_MEM		0x80
+#define SLJIT_MEM		0x80 //\b1110000
 #define SLJIT_MEM0()		(SLJIT_MEM)
 #define SLJIT_MEM1(r1)		(SLJIT_MEM | (r1))
 #define SLJIT_MEM2(r1, r2)	(SLJIT_MEM | (r1) | ((r2) << 8))
@@ -668,7 +682,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_fast_return(struct sljit_compiler 
    manually set it. E.g:
 
      SLJIT_ADD32 == (SLJIT_ADD | SLJIT_I32_OP) */
-#define SLJIT_I32_OP		0x100
+#define SLJIT_I32_OP		0x100 //\b100000000
 
 /* Set F32 (single) precision mode for floating-point computation. This
    option is similar to SLJIT_I32_OP, it just applies to floating point
@@ -1185,6 +1199,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_ijump(struct sljit_compiler *compi
      Important note: only dst=src and dstw=srcw is supported at the moment!
      Flags: Z (may destroy flags)
    Note: sljit_emit_op_flags does nothing, if dst is SLJIT_UNUSED (regardless of op). */
+//TODO using regexp to fill into function?
 SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_s32 op,
 	sljit_s32 dst, sljit_sw dstw,
 	sljit_s32 src, sljit_sw srcw,
