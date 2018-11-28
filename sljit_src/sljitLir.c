@@ -46,11 +46,15 @@
 			return NULL; \
 	} while (0)
 
+#if 0
 #define FAIL_IF(expr) \
 	do { \
 		if (SLJIT_UNLIKELY(expr)) \
 			return compiler->error; \
 	} while (0)
+#endif
+
+#define FAIL_IF(expr) if(expr)return compiler->error
 
 #define PTR_FAIL_IF(expr) \
 	do { \
@@ -700,6 +704,10 @@ static SLJIT_INLINE void set_const(struct sljit_const *const_, struct sljit_comp
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
 	}
 
+//static void sljit_function_check_dst(struct sljit_compiler *compiler,sljit_s32 p,sljit_sw i) 
+//{
+//}
+#if 1
 #define FUNCTION_CHECK_DST(p, i) \
 	CHECK_ARGUMENT(compiler->scratches != -1 && compiler->saveds != -1); \
 	if (FUNCTION_CHECK_IS_REG_OR_UNUSED(p)) \
@@ -718,15 +726,40 @@ static SLJIT_INLINE void set_const(struct sljit_const *const_, struct sljit_comp
 		} \
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
 	}
+#endif
 
+//static void sljit_function_fcheck(struct sljit_compiler *compiler, sljit_s32 p, sljit_sw i)
+//{
+//	CHECK_ARGUMENT(compiler->fscratches != -1 && compiler->fsaveds != -1); \
+//	if (((p) >= SLJIT_FR0 && (p) < (SLJIT_FR0 + compiler->fscratches)) || \
+//			((p) > (SLJIT_FS0 - compiler->fsaveds) && (p) <= SLJIT_FS0)){\
+//		CHECK_ARGUMENT(i == 0); \
+//	}else if ((p) == (SLJIT_MEM1(SLJIT_SP))){\
+//		CHECK_ARGUMENT((i) >= 0 && (i) < compiler->logical_local_size); \
+//	}else{ \
+//		CHECK_ARGUMENT((p) & SLJIT_MEM); \
+//		CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG_OR_UNUSED((p) & REG_MASK)); \
+//		CHECK_NOT_VIRTUAL_REGISTER((p) & REG_MASK); \
+//		if ((p) & OFFS_REG_MASK) { \
+//			CHECK_ARGUMENT(((p) & REG_MASK) != SLJIT_UNUSED); \
+//			CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG(OFFS_REG(p))); \
+//			CHECK_NOT_VIRTUAL_REGISTER(OFFS_REG(p)); \
+//			CHECK_ARGUMENT(((p) & OFFS_REG_MASK) != TO_OFFS_REG(SLJIT_SP) && !(i & ~0x3)); \
+//		} \
+//		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
+//	}
+//}
+//#define FUNCTION_FCHECK(p, i) sljit_function_fcheck(compiler,p,i)
+
+#if 1
 #define FUNCTION_FCHECK(p, i) \
 	CHECK_ARGUMENT(compiler->fscratches != -1 && compiler->fsaveds != -1); \
 	if (((p) >= SLJIT_FR0 && (p) < (SLJIT_FR0 + compiler->fscratches)) || \
-			((p) > (SLJIT_FS0 - compiler->fsaveds) && (p) <= SLJIT_FS0)) \
+			((p) > (SLJIT_FS0 - compiler->fsaveds) && (p) <= SLJIT_FS0)){\
 		CHECK_ARGUMENT(i == 0); \
-	else if ((p) == (SLJIT_MEM1(SLJIT_SP))) \
+	}else if ((p) == (SLJIT_MEM1(SLJIT_SP))){\
 		CHECK_ARGUMENT((i) >= 0 && (i) < compiler->logical_local_size); \
-	else { \
+	}else{ \
 		CHECK_ARGUMENT((p) & SLJIT_MEM); \
 		CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG_OR_UNUSED((p) & REG_MASK)); \
 		CHECK_NOT_VIRTUAL_REGISTER((p) & REG_MASK); \
@@ -738,6 +771,7 @@ static SLJIT_INLINE void set_const(struct sljit_const *const_, struct sljit_comp
 		} \
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
 	}
+#endif
 
 #endif /* SLJIT_ARGUMENT_CHECKS */
 

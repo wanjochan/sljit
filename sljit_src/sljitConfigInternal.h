@@ -686,6 +686,15 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 /* Feel free to redefine these two macros. */
 #ifndef SLJIT_ASSERT
 
+static void sljit_assert(char* f,int l){
+	SCC(printf)("Assertion failed at %s:%d\n", f,l);
+	SLJIT_HALT_PROCESS();
+}
+
+//#define SLJIT_ASSERT(x) do{if(!(x))sljit_assert(__FILE__,__LINE__);}while(0)
+#define SLJIT_ASSERT(x) if(!(x))sljit_assert(__FILE__,__LINE__)
+
+#if 0
 #define SLJIT_ASSERT(x) \
 	do { \
 		if (SLJIT_UNLIKELY(!(x))) { \
@@ -693,6 +702,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
 			SLJIT_HALT_PROCESS(); \
 		} \
 	} while (0)
+#endif
 
 #endif /* !SLJIT_ASSERT */
 
