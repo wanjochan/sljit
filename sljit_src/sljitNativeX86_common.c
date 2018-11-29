@@ -2433,14 +2433,18 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_emit_fop2(struct sljit_compiler *compil
 	if (FAST_IS_REG(dst)) {
 		dst_r = dst;
 		if (dst == src1)
+		{
 			; /* Do nothing here. */
+		}
 		else if (dst == src2 && (op == SLJIT_ADD_F64 || op == SLJIT_MUL_F64)) {
 			/* Swap arguments. */
 			src2 = src1;
 			src2w = src1w;
 		}
 		else if (dst != src2)
+		{
 			FAIL_IF(emit_sse2_load(compiler, op & SLJIT_F32_OP, dst_r, src1, src1w));
+		}
 		else {
 			dst_r = TMP_FREG;
 			FAIL_IF(emit_sse2_load(compiler, op & SLJIT_F32_OP, TMP_FREG, src1, src1w));
